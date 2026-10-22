@@ -1,0 +1,609 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Quality Pulse | AI Audit Reliability</title>
+
+<style>
+:root {
+  --bg: #f5f7fb;
+  --card: #ffffff;
+  --ink: #182230;
+  --muted: #738096;
+  --line: #e4e9f1;
+  --blue: #405cf5;
+  --red: #d92d45;
+  --green: #16865c;
+  --amber: #b7791f;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  background: var(--bg);
+  color: var(--ink);
+}
+
+header {
+  background: #111a2c;
+  color: white;
+  padding: 22px 5%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 15px;
+}
+
+.brand { font-size: 21px; font-weight: 750; letter-spacing: -.5px; }
+.brand span { color: #91a4ff; }
+.header-note { color: #bdc7d9; font-size: 12px; }
+
+main { max-width: 1250px; margin: auto; padding: 28px 22px 45px; }
+
+h1 { margin: 0 0 7px; font-size: 28px; letter-spacing: -.8px; }
+.subtitle { color: var(--muted); margin: 0 0 23px; line-height: 1.6; }
+
+.notice {
+  background: #eef2ff;
+  border: 1px solid #d9e0ff;
+  border-radius: 10px;
+  padding: 12px 15px;
+  font-size: 12px;
+  color: #3446a5;
+  margin-bottom: 23px;
+}
+
+.metrics {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 14px;
+  margin-bottom: 23px;
+}
+
+.card, .metric {
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: 13px;
+  box-shadow: 0 3px 12px #172b4d05;
+}
+
+.metric { padding: 18px; }
+.metric-label { font-size: 12px; color: var(--muted); }
+.metric-value { font-size: 28px; font-weight: 750; margin: 9px 0 5px; }
+.metric-foot { font-size: 11px; color: var(--muted); }
+
+.tabs { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 18px; }
+
+.tab {
+  border: 1px solid var(--line);
+  background: white;
+  border-radius: 8px;
+  padding: 10px 15px;
+  cursor: pointer;
+  font-weight: 600;
+  color: #556176;
+}
+
+.tab.active { background: var(--blue); color: white; border-color: var(--blue); }
+
+.panel { display: none; }
+.panel.active { display: block; }
+
+.card { padding: 20px; margin-bottom: 16px; }
+.card h2 { margin: 0 0 7px; font-size: 17px; }
+.desc { color: var(--muted); font-size: 12px; line-height: 1.6; margin-bottom: 17px; }
+
+.layout { display: grid; grid-template-columns: 1.15fr 1fr; gap: 16px; }
+
+input, select {
+  padding: 10px 12px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: white;
+  color: var(--ink);
+  outline-color: var(--blue);
+  width: 100%;
+  margin-bottom: 12px;
+}
+
+.queue-item {
+  padding: 13px 11px;
+  border: 1px solid var(--line);
+  border-radius: 9px;
+  margin-bottom: 9px;
+  cursor: pointer;
+}
+
+.queue-item.selected { border-color: var(--blue); background: #f5f6ff; }
+.queue-title { display: flex; justify-content: space-between; gap: 10px; font-weight: 650; font-size: 13px; }
+.queue-sub { color: var(--muted); font-size: 11px; margin-top: 7px; }
+
+.badge {
+  display: inline-block;
+  padding: 4px 7px;
+  border-radius: 5px;
+  font-size: 10px;
+  font-weight: 750;
+  white-space: nowrap;
+}
+
+.high { background: #ffeaed; color: var(--red); }
+.medium { background: #fff4d9; color: var(--amber); }
+.low { background: #e3f7ed; color: var(--green); }
+
+.evidence {
+  background: #f6f8fc;
+  border-left: 3px solid var(--blue);
+  padding: 13px;
+  border-radius: 5px;
+  line-height: 1.7;
+  font-size: 13px;
+  margin: 13px 0;
+}
+
+.finding {
+  border: 1px solid #f4c5cc;
+  background: #fff7f8;
+  padding: 12px;
+  border-radius: 8px;
+  font-size: 13px;
+  line-height: 1.6;
+  margin: 12px 0;
+}
+
+button.action {
+  border: 0;
+  background: var(--blue);
+  color: white;
+  padding: 10px 13px;
+  border-radius: 7px;
+  font-weight: 650;
+  cursor: pointer;
+  margin: 3px 5px 3px 0;
+}
+
+button.secondary { background: #edf0f7; color: #344054; }
+button.danger { background: #b42335; }
+
+.result {
+  padding: 14px;
+  border-radius: 9px;
+  background: #f2f5fa;
+  margin-top: 14px;
+  font-size: 13px;
+  line-height: 1.7;
+}
+
+.result.pass { background: #e8f7ef; color: #116344; }
+.result.fail { background: #fff0f1; color: #a51d30; }
+
+table { width: 100%; border-collapse: collapse; font-size: 12px; }
+th, td { padding: 12px 8px; text-align: left; border-bottom: 1px solid var(--line); }
+th { color: var(--muted); font-weight: 600; }
+
+footer { text-align: center; color: var(--muted); font-size: 11px; padding-top: 12px; }
+
+@media(max-width: 760px) {
+  .metrics { grid-template-columns: repeat(2, 1fr); }
+  .layout { grid-template-columns: 1fr; }
+  header { align-items: flex-start; flex-direction: column; }
+  h1 { font-size: 23px; }
+}
+</style>
+</head>
+
+<body>
+
+<header>
+  <div class="brand">QUALITY<span>PULSE</span></div>
+  <div class="header-note">QUALITY & COMPLIANCE OPERATIONS · DEMO ENVIRONMENT</div>
+</header>
+
+<main>
+  <h1>AI Audit Reliability Console</h1>
+  <p class="subtitle">
+    Find risky conversations. Verify AI decisions. Prevent quality regressions.
+  </p>
+
+  <div class="notice">
+    DEMO MODE — All records and results are simulated. No real student information is used.
+  </div>
+
+  <section class="metrics">
+    <div class="metric">
+      <div class="metric-label">Conversations in queue</div>
+      <div class="metric-value" id="queueMetric">6</div>
+      <div class="metric-foot">Synthetic audit dataset</div>
+    </div>
+    <div class="metric">
+      <div class="metric-label">High-risk cases</div>
+      <div class="metric-value" id="riskMetric">2</div>
+      <div class="metric-foot">Require priority review</div>
+    </div>
+    <div class="metric">
+      <div class="metric-label">Human decisions</div>
+      <div class="metric-value" id="reviewMetric">0</div>
+      <div class="metric-foot">Recorded in this session</div>
+    </div>
+    <div class="metric">
+      <div class="metric-label">Prompt release status</div>
+      <div class="metric-value" style="font-size:19px;color:#b42335" id="releaseMetric">ON HOLD</div>
+      <div class="metric-foot">Safety gate enabled</div>
+    </div>
+  </section>
+
+  <nav class="tabs">
+    <button class="tab active" data-tab="operations">01 · Audit Queue</button>
+    <button class="tab" data-tab="review">02 · Human Review</button>
+    <button class="tab" data-tab="evaluation">03 · Prompt Lab</button>
+    <button class="tab" data-tab="feedback">04 · Feedback Guard</button>
+  </nav>
+
+  <!-- MODULE 1 -->
+  <section class="panel active" id="operations">
+    <div class="layout">
+      <div class="card">
+        <h2>Audit Operations</h2>
+        <p class="desc">
+          Prioritise cases by potential harm rather than reviewing conversations in arrival order.
+        </p>
+
+        <input id="search" placeholder="Search case ID, issue or advisor..." />
+
+        <select id="riskFilter">
+          <option value="All">All risk levels</option>
+          <option value="High">High risk</option>
+          <option value="Medium">Medium risk</option>
+          <option value="Low">Low risk</option>
+        </select>
+
+        <div id="queue"></div>
+      </div>
+
+      <div class="card">
+        <h2>Case intelligence</h2>
+        <p class="desc">Select a case to inspect its context and recommended next step.</p>
+        <div id="caseDetail"></div>
+        <button class="action" onclick="openReview()">Review selected case →</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- MODULE 2 -->
+  <section class="panel" id="review">
+    <div class="card">
+      <h2>Human Review Workbench</h2>
+      <p class="desc">
+        An AI finding is a hypothesis to verify, not an unquestionable decision.
+        Review the evidence before recording an outcome.
+      </p>
+      <div id="reviewDetail"></div>
+    </div>
+  </section>
+
+  <!-- MODULE 3 -->
+  <section class="panel" id="evaluation">
+    <div class="card">
+      <h2>Prompt Evaluation Lab</h2>
+      <p class="desc">
+        Compare two simulated prompts against a labelled evaluation set.
+        Overall accuracy alone is insufficient when serious violations are involved.
+      </p>
+
+      <table>
+        <thead>
+          <tr>
+            <th>Evaluation measure</th>
+            <th>Existing prompt A</th>
+            <th>Candidate prompt B</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td>Correct classifications</td><td>94 / 100</td><td>96 / 100</td></tr>
+          <tr><td>Overall accuracy</td><td>94%</td><td>96%</td></tr>
+          <tr><td>Serious violations detected</td><td>10 / 10</td><td>9 / 10</td></tr>
+          <tr><td>Serious violations missed</td><td>0</td><td>1</td></tr>
+          <tr><td>Release recommendation</td><td>Baseline</td><td>Safety review required</td></tr>
+        </tbody>
+      </table>
+
+      <div class="finding">
+        <strong>Regression detected:</strong> Candidate B improves overall accuracy but misses
+        one serious violation caught by prompt A. A higher aggregate score does not automatically
+        make the candidate safer.
+      </div>
+
+      <h2 style="margin-top:22px">Release decision</h2>
+      <p class="desc">
+        What should happen when a candidate introduces a serious compliance regression?
+      </p>
+
+      <button class="action" onclick="releaseDecision('hold')">Hold candidate B</button>
+      <button class="action danger" onclick="releaseDecision('release')">Release candidate B</button>
+
+      <div class="result" id="releaseResult">
+        Awaiting your decision. Choose an option to see the simulated release-gate outcome.
+      </div>
+
+      <h2 style="margin-top:25px">Evaluation checklist</h2>
+      <div style="font-size:13px;line-height:2">
+        <label><input type="checkbox" style="width:auto;margin:0 8px 0 0"> Test set contains labelled examples of serious violations</label><br>
+        <label><input type="checkbox" style="width:auto;margin:0 8px 0 0"> False negatives reviewed by severity</label><br>
+        <label><input type="checkbox" style="width:auto;margin:0 8px 0 0"> Previous prompt results retained for comparison</label><br>
+        <label><input type="checkbox" style="width:auto;margin:0 8px 0 0"> Human approval obtained before release</label>
+      </div>
+    </div>
+  </section>
+
+  <!-- MODULE 4 -->
+  <section class="panel" id="feedback">
+    <div class="card">
+      <h2>Feedback Fatigue Guard</h2>
+      <p class="desc">
+        Routine coaching can be grouped into a useful daily summary.
+        Urgent compliance findings should bypass batching and be escalated immediately.
+      </p>
+
+      <div class="layout">
+        <div>
+          <h2>Simulate a feedback event</h2>
+          <label for="feedbackType" class="desc">Choose the type of finding.</label>
+          <select id="feedbackType">
+            <option value="routine">Routine coaching opportunity</option>
+            <option value="serious">Serious compliance violation</option>
+          </select>
+
+          <button class="action" onclick="routeFeedback()">Route feedback</button>
+          <div class="result" id="feedbackResult">
+            No feedback event processed yet.
+          </div>
+        </div>
+
+        <div>
+          <h2>Routing policy</h2>
+          <div class="evidence">
+            <strong>Routine finding</strong><br>
+            Add to the next scheduled coaching digest, subject to the team's feedback policy.
+          </div>
+          <div class="finding">
+            <strong>Serious violation</strong><br>
+            Escalate immediately through the defined compliance workflow. Never delay urgent
+            action just to reduce notification volume.
+          </div>
+        </div>
+      </div>
+
+      <h2 style="margin-top:25px">Session activity</h2>
+      <div id="activity" class="desc">No actions recorded yet.</div>
+    </div>
+  </section>
+
+  <footer>
+    Quality Pulse · Independent portfolio prototype · Synthetic data only
+  </footer>
+</main>
+
+<script>
+const cases = [
+  {
+    id:"QP-101", advisor:"Advisor A", risk:"High", issue:"Unsupported outcome guarantee",
+    age:"18 min", status:"Pending review",
+    conversation:"If you enrol today, I can guarantee that you will get a job within three months.",
+    finding:"Potentially misleading guarantee about employment outcomes.",
+    reason:"The statement promises a specific outcome that may not be supported by approved policy.",
+    next:"Verify against the approved claims policy and escalate if confirmed."
+  },
+  {
+    id:"QP-102", advisor:"Advisor B", risk:"Medium", issue:"Missing fee disclosure",
+    age:"42 min", status:"Pending review",
+    conversation:"We can discuss the programme fee after you complete the registration.",
+    finding:"Potential omission of required fee information before a decision.",
+    reason:"The sequence may prevent the prospect from making an informed decision.",
+    next:"Check the disclosure requirements and coach the advisor if a violation is confirmed."
+  },
+  {
+    id:"QP-103", advisor:"Advisor C", risk:"Low", issue:"Unclear next steps",
+    age:"1 hr", status:"Pending review",
+    conversation:"Someone from our team will contact you sometime soon.",
+    finding:"Next action and expected contact timeline are unclear.",
+    reason:"The prospect has no concrete expectation about what happens next.",
+    next:"Recommend a specific follow-up action and a reasonable timeline."
+  },
+  {
+    id:"QP-104", advisor:"Advisor D", risk:"High", issue:"Pressure to enrol",
+    age:"9 min", status:"Pending review",
+    conversation:"You must pay immediately. There is no need to read the terms; just trust me.",
+    finding:"Potential coercive enrolment pressure and discouragement of informed consent.",
+    reason:"The statement pressures the prospect to pay while discouraging review of terms.",
+    next:"Prioritise human review and escalate through the compliance process if confirmed."
+  },
+  {
+    id:"QP-105", advisor:"Advisor E", risk:"Medium", issue:"Unverified discount claim",
+    age:"55 min", status:"Pending review",
+    conversation:"I believe the discount is available, but I need to check with the team.",
+    finding:"Discount availability is uncertain.",
+    reason:"The advisor acknowledges uncertainty, so this may be an appropriate qualification rather than a violation.",
+    next:"Verify the offer. Do not penalise the advisor solely for expressing uncertainty."
+  },
+  {
+    id:"QP-106", advisor:"Advisor F", risk:"Low", issue:"Generic follow-up",
+    age:"2 hr", status:"Pending review",
+    conversation:"Thank you for speaking with us. Please let us know if you have any questions.",
+    finding:"Follow-up lacks a specific next step.",
+    reason:"This is a coaching opportunity, not necessarily a compliance violation.",
+    next:"Suggest a clearer follow-up while avoiding unnecessary escalation."
+  }
+];
+
+let selectedId = "QP-101";
+let decisions = {};
+let activity = [];
+
+function log(message) {
+  activity.unshift(message);
+  document.getElementById("activity").innerHTML = activity
+    .map(item => "• " + escapeHTML(item)).join("<br>");
+}
+
+function escapeHTML(value) {
+  return String(value).replace(/[&<>"']/g, char => ({
+    "&":"&amp;", "<":"&lt;", ">":"&gt;", '"':"&quot;", "'":"&#039;"
+  }[char]));
+}
+
+function getSelected() {
+  return cases.find(item => item.id === selectedId);
+}
+
+function renderQueue() {
+  const query = document.getElementById("search").value.toLowerCase();
+  const filter = document.getElementById("riskFilter").value;
+
+  const filtered = cases.filter(item =>
+    (filter === "All" || item.risk === filter) &&
+    (item.id + item.advisor + item.issue).toLowerCase().includes(query)
+  );
+
+  document.getElementById("queue").innerHTML = filtered.map(item => `
+    <div class="queue-item ${item.id === selectedId ? "selected" : ""}"
+         onclick="selectCase('${item.id}')">
+      <div class="queue-title">
+        <span>${item.id} · ${escapeHTML(item.issue)}</span>
+        <span class="badge ${item.risk.toLowerCase()}">${item.risk}</span>
+      </div>
+      <div class="queue-sub">
+        ${escapeHTML(item.advisor)} · ${item.age} · ${escapeHTML(decisions[item.id] || item.status)}
+      </div>
+    </div>
+  `).join("") || "<p class='desc'>No matching cases.</p>";
+}
+
+function renderCase() {
+  const item = getSelected();
+
+  document.getElementById("caseDetail").innerHTML = `
+    <span class="badge ${item.risk.toLowerCase()}">${item.risk} risk</span>
+    <p><strong>${item.id}: ${escapeHTML(item.issue)}</strong></p>
+    <p class="desc">Owner: ${escapeHTML(item.advisor)} · Waiting: ${item.age}</p>
+    <div class="evidence">${escapeHTML(item.conversation)}</div>
+    <div class="finding"><strong>AI-generated finding</strong><br>
+      ${escapeHTML(item.finding)}
+    </div>
+    <p style="font-size:13px;line-height:1.7">
+      <strong>Suggested action:</strong><br>${escapeHTML(item.next)}
+    </p>
+  `;
+  renderQueue();
+}
+
+function renderReview() {
+  const item = getSelected();
+  document.getElementById("reviewDetail").innerHTML = `
+    <span class="badge ${item.risk.toLowerCase()}">${item.risk} risk</span>
+    <h3>${item.id} · ${escapeHTML(item.issue)}</h3>
+    <p class="desc">Review the evidence before accepting the AI's conclusion.</p>
+    <h3>Conversation excerpt</h3>
+    <div class="evidence">${escapeHTML(item.conversation)}</div>
+    <h3>AI finding</h3>
+    <div class="finding">${escapeHTML(item.finding)}</div>
+    <h3>Why the system flagged it</h3>
+    <p style="font-size:13px;line-height:1.7">${escapeHTML(item.reason)}</p>
+    <h3>Human decision</h3>
+    <button class="action" onclick="decide('Confirmed')">Confirm finding</button>
+    <button class="action secondary" onclick="decide('Overturned')">Overturn finding</button>
+    <button class="action secondary" onclick="decide('Needs investigation')">Needs investigation</button>
+    <div class="result" id="decisionResult">
+      Current decision: ${escapeHTML(decisions[item.id] || "Not reviewed")}
+    </div>
+  `;
+}
+
+function selectCase(id) {
+  selectedId = id;
+  renderCase();
+  renderReview();
+}
+
+function openReview() {
+  document.querySelector('[data-tab="review"]').click();
+}
+
+function decide(decision) {
+  const item = getSelected();
+  decisions[item.id] = decision;
+  document.getElementById("reviewMetric").textContent = Object.keys(decisions).length;
+
+  const element = document.getElementById("decisionResult");
+  element.className = "result " + (decision === "Confirmed" ? "fail" : "pass");
+  element.innerHTML = "Recorded decision: <strong>" + escapeHTML(decision) +
+    "</strong><br>Case: " + item.id +
+    "<br>This demo records your decision locally for the current session.";
+
+  log(item.id + ": " + decision);
+  renderQueue();
+}
+
+function releaseDecision(choice) {
+  const result = document.getElementById("releaseResult");
+  const metric = document.getElementById("releaseMetric");
+
+  if (choice === "hold") {
+    result.className = "result pass";
+    result.innerHTML = "<strong>Candidate held — appropriate safety decision.</strong><br>" +
+      "Investigate the missed serious violation, add targeted evaluation cases, " +
+      "retest the candidate and require approval before reconsidering release.";
+    metric.textContent = "ON HOLD";
+    metric.style.color = "#b42335";
+    log("Prompt B held due to a serious-violation regression.");
+  } else {
+    result.className = "result fail";
+    result.innerHTML = "<strong>Release blocked by the demo safety gate.</strong><br>" +
+      "The candidate misses a serious violation detected by the baseline. " +
+      "A higher overall accuracy score does not override this critical regression.";
+    metric.textContent = "BLOCKED";
+    metric.style.color = "#b42335";
+    log("Prompt B release blocked by the safety gate.");
+  }
+}
+
+function routeFeedback() {
+  const type = document.getElementById("feedbackType").value;
+  const result = document.getElementById("feedbackResult");
+
+  if (type === "serious") {
+    result.className = "result fail";
+    result.innerHTML = "<strong>Immediate escalation.</strong><br>" +
+      "Route to the designated compliance reviewer now. Do not wait for the daily digest.";
+    log("Serious finding routed for immediate escalation.");
+  } else {
+    result.className = "result pass";
+    result.innerHTML = "<strong>Added to coaching digest.</strong><br>" +
+      "Group this routine finding with relevant coaching items for the next scheduled delivery.";
+    log("Routine coaching finding added to the digest.");
+  }
+}
+
+document.querySelectorAll(".tab").forEach(button => {
+  button.addEventListener("click", () => {
+    document.querySelectorAll(".tab").forEach(tab => tab.classList.remove("active"));
+    document.querySelectorAll(".panel").forEach(panel => panel.classList.remove("active"));
+
+    button.classList.add("active");
+    document.getElementById(button.dataset.tab).classList.add("active");
+
+    if (button.dataset.tab === "review") renderReview();
+  });
+});
+
+document.getElementById("search").addEventListener("input", renderQueue);
+document.getElementById("riskFilter").addEventListener("change", renderQueue);
+
+renderQueue();
+renderCase();
+renderReview();
+</script>
+</body>
+</html>
