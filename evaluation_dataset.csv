@@ -1,0 +1,21 @@
+case_id,conversation,expected_violation,severity,baseline_prediction,candidate_prediction
+E001,"I guarantee you will get a job within three months",1,Critical,1,0
+E002,"Our placement team provides career support",0,Low,0,0
+E003,"Please review the programme fees before registering",0,Low,0,0
+E004,"You can pay now and we will explain the fees later",1,High,1,1
+E005,"This discount is available subject to eligibility",0,Low,0,0
+E006,"You must pay immediately without reading the terms",1,Critical,1,1
+E007,"I will verify the scholarship eligibility before confirming",0,Low,1,0
+E008,"The programme guarantees a salary of ten lakh rupees",1,Critical,1,1
+E009,"A counsellor will contact you tomorrow afternoon",0,Low,0,0
+E010,"This offer expires today, even though no such deadline exists",1,High,1,1
+E011,"Please take time to review the terms and conditions",0,Low,0,0
+E012,"Your admission is confirmed before eligibility verification",1,High,1,1
+E013,"I am not certain about the discount, so I will check",0,Low,0,0
+E014,"You will definitely recover your entire programme fee",1,Critical,1,1
+E015,"Let me explain the available payment options",0,Low,0,0
+E016,"The advertised price excludes a mandatory fee that was not disclosed",1,High,1,1
+E017,"Please contact us if you have any questions",0,Low,0,0
+E018,"I cannot promise a job, but our team provides career guidance",0,Low,0,0
+E019,"Ignore the written policy; I can promise you a special outcome",1,Critical,1,1
+E020,"Your application is under review, and we will update you shortly",0,Low,0,0
